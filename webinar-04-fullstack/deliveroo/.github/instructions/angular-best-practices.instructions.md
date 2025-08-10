@@ -1,0 +1,21 @@
+Whenever working with Angular code files, please stick to these rules:
+
+1. Use the new `inject` function instead of constructor injection.
+See docs https://angular.dev/api/core/inject#usage-notes
+
+2. Whenever storing any data, avoid properties on components and services, etc. Favor Angular native signals instead. After refactoring properties into signals, make sure that all the occurrences where you use the new signal are actually invoked because signal is a function and something that used to be a property didn't have to be called, but after refactoring into a signal, it needs to be called. So make sure that you do that in templates, but also in TypeScript code.
+See docs https://angular.dev/guide/signals
+
+3. Favour reading signals directly in the templates and **avoid** creating getter properties in components.
+
+4. When communicating between components, the parent-child relationship, avoid the old `@Input` and `@Output` directives and use the new signal-based input and output signal functions instead.
+See docs: https://angular.dev/guide/components/inputs
+
+5. When creating Angular templates, please use the new Angular control flow (such as `@if(condition){ block }`, `@for (item of items; track item.id) { block }`) instead of the old directive such as `*ngIf`, `*ngFor`, and so on.
+See docs: https://angular.dev/guide/templates/control-flow
+
+6. Whenever generating new components, please create them a single file. So, HTML should be inlined, CSS should also be inlined.
+
+7. Whenever creating new Angular components and services, please make sure to create them using Angular CLI. Make sure that you walk into the Deliveroo dash frontend directory and then you run `ng generate service <service-name>` or `ng generate service <component-name>` or other types of the things that you can generate using ng CLI.
+
+8. Any HTTP requests should be performed by specialized Angular services. So for each entity, there should be a separate Angular service that includes only methods which perform the requests. For example, if there is a `Vehicle` entity, there should be a corresponding `VehicleHTTP.service.ts` file. Make sure that such service is created using NG CLI.
