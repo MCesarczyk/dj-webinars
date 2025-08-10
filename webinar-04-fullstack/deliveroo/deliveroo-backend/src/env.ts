@@ -8,4 +8,4 @@ function assertEnvVars(...vars: string[]): void {
   }
 }
 
-export { assertEnvVars }; 
+export { assertEnvVars };

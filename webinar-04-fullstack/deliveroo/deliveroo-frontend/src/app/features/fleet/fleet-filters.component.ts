@@ -39,9 +39,9 @@ import { VehicleType, VehicleStatus } from './vehicle.model';
           </select>
         </div>
         <div class="flex flex-wrap gap-2 items-center">
-          <input type="date" class="form-control rounded-lg border border-neutral-200 py-2 px-3 min-w-[170px]" [value]="fleetStore.search().lastMaintenanceFrom ?? ''" (change)="onLastMaintenanceFromChange($event)" placeholder="From" />
+          <input type="date" class="form-control rounded-lg border border-neutral-200 py-2 px-3 min-w-44" [value]="fleetStore.search().lastMaintenanceFrom ?? ''" (change)="onLastMaintenanceFromChange($event)" placeholder="From" />
           <span class="text-neutral-400">-</span>
-          <input type="date" class="form-control rounded-lg border border-neutral-200 py-2 px-3 min-w-[170px]" [value]="fleetStore.search().lastMaintenanceTo ?? ''" (change)="onLastMaintenanceToChange($event)" placeholder="To" />
+          <input type="date" class="form-control rounded-lg border border-neutral-200 py-2 px-3 min-w-44" [value]="fleetStore.search().lastMaintenanceTo ?? ''" (change)="onLastMaintenanceToChange($event)" placeholder="To" />
         </div>
         <button type="button" class="clear-filters-btn ml-auto" (click)="clearFilters()">
           <span class="material-icons clear-icon">close</span>
@@ -56,7 +56,6 @@ import { VehicleType, VehicleStatus } from './vehicle.model';
     `.clear-filters-btn { display: flex; align-items: center; background: #f6f6f6; color: #666; border: none; border-radius: 6px; padding: 0.25rem 0.75rem; font-size: 0.95rem; transition: background 0.2s, color 0.2s; box-shadow: none; outline: none; cursor: pointer; }`,
     `.clear-filters-btn:hover, .clear-filters-btn:focus { background: #ececec; color: #222; }`,
     `.clear-icon { font-size: 1.1rem; margin-right: 0.3em; opacity: 0.7; }`,
-    `.min-w-[170px] { min-width: 170px; }`,
     `.border-neutral-100 { border-color: #f3f4f6; }`,
     `.rounded-xl { border-radius: 1rem; }`,
     `.shadow-md { box-shadow: 0 4px 24px 0 rgba(0,0,0,0.04); }`
