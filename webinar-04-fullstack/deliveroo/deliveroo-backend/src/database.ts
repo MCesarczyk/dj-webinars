@@ -2,11 +2,17 @@ import { Pool } from 'pg';
 import fs from 'fs';
 
 const passwordFilePath = process.env.DB_PASSWORD_FILE!;
-if (!fs.existsSync(passwordFilePath)) {
+if (process.env.NODE_ENV !== 'development' && !fs.existsSync(passwordFilePath)) {
   throw new Error(`Password file not found at path: ${passwordFilePath}`);
 }
 
-const dbPassword: string = fs.readFileSync(process.env.DB_PASSWORD_FILE as string, 'utf8').trim();
+const getDbPassword = (): string => {
+  if (process.env.NODE_ENV === 'development') {
+    return process.env.DB_PASSWORD || '';
+  }
+
+  return fs.readFileSync(process.env.DB_PASSWORD_FILE as string, 'utf8').trim();
+};
 
 // Create and export the pool
 const pool = new Pool({
@@ -14,7 +20,7 @@ const pool = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
   database: process.env.DB_NAME,
-  password: dbPassword,
+  password: getDbPassword(),
   port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : undefined,
 });
 

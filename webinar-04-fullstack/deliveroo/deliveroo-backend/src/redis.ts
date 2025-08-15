@@ -3,13 +3,20 @@ import { createClient, RedisClientType } from 'redis';
 import logger from './logger';
 
 const passwordFilePath = process.env.REDIS_PASSWORD_FILE!;
-if (!fs.existsSync(passwordFilePath)) {
+if (process.env.NODE_ENV !== 'development' && !fs.existsSync(passwordFilePath)) {
   throw new Error(`Password file not found at path: ${passwordFilePath}`);
 }
 
 // Read Redis password and build the connection URL
-const redisPassword: string = fs.readFileSync(process.env.REDIS_PASSWORD_FILE as string, 'utf8').trim();
-const redisUrl: string = `redis://:${redisPassword}@${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`;
+const getRedisPassword = (): string => {
+  if (process.env.NODE_ENV === 'development') {
+    return process.env.REDIS_PASSWORD || '';
+  }
+
+  return fs.readFileSync(process.env.REDIS_PASSWORD_FILE as string, 'utf8').trim();
+};
+
+const redisUrl: string = `redis://:${getRedisPassword()}@${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`;
 
 // Create and connect Redis client
 const redisClient: RedisClientType = createClient({
