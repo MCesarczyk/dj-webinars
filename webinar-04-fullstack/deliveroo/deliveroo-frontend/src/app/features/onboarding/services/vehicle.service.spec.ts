@@ -9,6 +9,9 @@ import { VehicleService } from './vehicle.service';
 import { environment } from '../../../../environments/environment';
 
 describe('VehicleService', () => {
+  const TEST_API_URL = 'http://test-api-url';
+  const originalEnvironment = { ...environment };
+
   let service: VehicleService;
   let httpMock: HttpTestingController;
   let loggerService: LoggerService;
@@ -42,6 +45,8 @@ describe('VehicleService', () => {
   ];
 
   beforeEach(() => {
+    environment.apiUrl = TEST_API_URL;
+
     TestBed.configureTestingModule({
       imports: [],
       providers: [
@@ -60,10 +65,15 @@ describe('VehicleService', () => {
 
   afterEach(() => {
     httpMock.verify();
+    Object.assign(environment, originalEnvironment);
   });
 
   it('should be created', () => {
     expect(service).toBeTruthy();
+  });
+
+  it('should use mock API URL', () => {
+    expect(environment.apiUrl).toBe(TEST_API_URL);
   });
 
   describe('getAvailableVehicles', () => {
@@ -75,6 +85,14 @@ describe('VehicleService', () => {
         expect(response.data![0].status).toBe('available');
         expect(response.message).toBe('Available vehicles fetched successfully');
         done();
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/vehicles?status=available&unassigned=true`);
+      expect(req.request.method).toBe('GET');
+      req.flush({
+        success: true,
+        message: 'Available vehicles fetched successfully',
+        data: mockVehicles
       });
     });
 
@@ -89,6 +107,14 @@ describe('VehicleService', () => {
         expect(vehicle).toHaveProperty('lastMaintenance');
         done();
       });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/vehicles?status=available&unassigned=true`);
+      expect(req.request.method).toBe('GET');
+      req.flush({
+        success: true,
+        message: 'Available vehicles fetched successfully',
+        data: mockVehicles
+      });
     });
 
     it('should log the fetching process', (done) => {
@@ -101,6 +127,14 @@ describe('VehicleService', () => {
           expect.any(Array)
         );
         done();
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/vehicles?status=available&unassigned=true`);
+      expect(req.request.method).toBe('GET');
+      req.flush({
+        success: true,
+        message: 'Available vehicles fetched successfully',
+        data: mockVehicles
       });
     });
   });

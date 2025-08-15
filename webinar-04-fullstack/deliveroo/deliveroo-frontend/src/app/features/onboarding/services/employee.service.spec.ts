@@ -7,8 +7,12 @@ import {
   VehicleAssignmentFormData,
 } from '../interfaces/employee.interface';
 import { provideHttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
 
 describe('EmployeeService', () => {
+  const TEST_API_URL = 'http://test-api-url';
+  const originalEnvironment = { ...environment };
+
   let service: EmployeeService;
   let httpMock: HttpTestingController;
   let loggerService: LoggerService;
@@ -35,6 +39,8 @@ describe('EmployeeService', () => {
   };
 
   beforeEach(() => {
+    environment.apiUrl = TEST_API_URL;
+
     TestBed.configureTestingModule({
       imports: [],
       providers: [
@@ -52,10 +58,15 @@ describe('EmployeeService', () => {
 
   afterEach(() => {
     httpMock.verify();
+    Object.assign(environment, originalEnvironment);
   });
 
   it('should be created', () => {
     expect(service).toBeTruthy();
+  });
+
+  it('should use mock API URL', () => {
+    expect(environment.apiUrl).toBe(TEST_API_URL);
   });
 
   describe('completeOnboarding', () => {
@@ -69,6 +80,17 @@ describe('EmployeeService', () => {
         expect(response.message).toBe('Employee onboarding completed successfully');
         done();
       });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/onboarding/complete`);
+      expect(req.request.method).toBe('POST');
+      req.flush({
+        success: true,
+        message: 'Employee onboarding completed successfully',
+        data: {
+          employee: { ...mockEmployeeData, id: 1 },
+          vehicleAssignment: { ...mockVehicleAssignmentData, id: 1, employee_id: 1 }
+        }
+      });
     });
 
     it('should complete onboarding with employee only (no vehicle)', (done) => {
@@ -78,6 +100,16 @@ describe('EmployeeService', () => {
         expect(response.data?.vehicleAssignment).toBeUndefined();
         expect(response.data?.employee.name).toBe(mockEmployeeData.name);
         done();
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/onboarding/complete`);
+      expect(req.request.method).toBe('POST');
+      req.flush({
+        success: true,
+        message: 'Employee onboarding completed successfully',
+        data: {
+          employee: { ...mockEmployeeData, id: 1 },
+        }
       });
     });
 
@@ -96,6 +128,17 @@ describe('EmployeeService', () => {
         );
         done();
       });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/onboarding/complete`);
+      expect(req.request.method).toBe('POST');
+      req.flush({
+        success: true,
+        message: 'Employee onboarding completed successfully',
+        data: {
+          employee: { ...mockEmployeeData, id: 1 },
+          vehicleAssignment: { ...mockVehicleAssignmentData, id: 1, employee_id: 1 }
+        }
+      });
     });
   });
 
@@ -107,6 +150,10 @@ describe('EmployeeService', () => {
         expect(isUnique).toBe(true);
         done();
       });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/employees/check-email?email=unique@test.com`);
+      expect(req.request.method).toBe('GET');
+      req.flush({ available: true });
     });
 
     it('should return false for taken email', (done) => {
@@ -116,6 +163,10 @@ describe('EmployeeService', () => {
         expect(isUnique).toBe(false);
         done();
       });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/employees/check-email?email=${takenEmail}`);
+      expect(req.request.method).toBe('GET');
+      req.flush({ available: false });
     });
 
     it('should be case insensitive', (done) => {
@@ -125,6 +176,10 @@ describe('EmployeeService', () => {
         expect(isUnique).toBe(false);
         done();
       });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/employees/check-email?email=${takenEmail}`);
+      expect(req.request.method).toBe('GET');
+      req.flush({ available: false });
     });
 
     it('should log the email checking process', (done) => {
@@ -141,6 +196,10 @@ describe('EmployeeService', () => {
         );
         done();
       });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/employees/check-email?email=${email}`);
+      expect(req.request.method).toBe('GET');
+      req.flush({ available: true });
     });
   });
 });
