@@ -3,6 +3,7 @@ import { startTransaction, commitTransaction, rollbackTransaction } from '../dat
 import { assignVehicleToEmployee } from './onboarding.service';
 import { createEmployee } from '../employee/employee.service';
 import { invokeMemoryLeak } from '../memory-leak';
+import redisClient from '../redis';
 
 const router = express.Router();
 
@@ -25,7 +26,9 @@ router.post('/complete', async (req: Request, res: Response) => {
 
     await commitTransaction(transaction);
 
+    await redisClient.del('vehicles-unassigned');
     return res.status(201).json({
+      success: true,
       message: 'Onboarding complete',
       data: {
         employee,
