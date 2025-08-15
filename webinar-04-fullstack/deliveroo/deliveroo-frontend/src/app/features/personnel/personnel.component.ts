@@ -1,19 +1,23 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { EmployeeOnboardingComponent } from '../onboarding/components/employee-onboarding/employee-onboarding.component';
 
 @Component({
   selector: 'app-personnel',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, EmployeeOnboardingComponent],
   template: `
     <div class="container mx-auto px-4 py-8">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
         <h1 class="text-2xl font-bold">Personnel Management</h1>
         <div class="mt-4 md:mt-0">
-          <button class="btn btn-primary">
+          <button class="btn btn-primary" (click)="showOnboarding.set(!showOnboarding())">
             <span class="material-icons mr-1">person_add</span>
             Add Personnel
           </button>
+          @if (showOnboarding()) {
+            <app-employee-onboarding [hideOnboarding]="hideOnboarding"></app-employee-onboarding>
+          }
         </div>
       </div>
 
@@ -25,9 +29,9 @@ import { CommonModule } from '@angular/common';
               <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-neutral-500">
                 <span class="material-icons text-base">search</span>
               </span>
-              <input 
-                type="text" 
-                placeholder="Search personnel..." 
+              <input
+                type="text"
+                placeholder="Search personnel..."
                 class="form-control pl-10" />
             </div>
           </div>
@@ -135,6 +139,12 @@ import { CommonModule } from '@angular/common';
   `
 })
 export class PersonnelComponent {
+  showOnboarding = signal<boolean>(false);
+
+  hideOnboarding = () => {
+    this.showOnboarding.set(false);
+  };
+
   personnel = [
     {
       id: 'EMP-001',
@@ -203,8 +213,8 @@ export class PersonnelComponent {
 
   getStatusClass(status: string): string {
     const baseClasses = 'px-2 py-1 text-xs font-medium rounded-full';
-    
-    switch(status) {
+
+    switch (status) {
       case 'Active':
         return `${baseClasses} bg-success-50 text-success-500`;
       case 'On Leave':
