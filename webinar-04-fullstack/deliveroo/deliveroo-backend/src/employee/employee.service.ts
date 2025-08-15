@@ -1,40 +1,40 @@
-import pool from './database';
+import { PoolClient } from 'pg';
+import pool from '../database/client';
+import logger from '../logger';
 
-/**
- * Returns a list of all vehicles.
- * Each vehicle includes all columns from the vehicles table.
- */
-export async function getAllVehicles() {
-  const result = await pool.query('SELECT * FROM vehicles ORDER BY id');
-  return result.rows;
+export async function checkEmailUniqueness(email: string, poolClient?: PoolClient) {
+  logger.info('Checking email uniqueness for:', email);
+
+  const result = await (poolClient || pool).query(
+    `
+    SELECT COUNT(*) AS count
+    FROM employees
+    WHERE contact_email = $1
+    `,
+    [email]
+  );
+  return Number(result.rows[0].count) === 0;
 }
 
-export async function getAllVehiclesWithDriver() {
-  const result = await pool.query(`
-    SELECT
-      v.*,
-      e.name AS driver_name
-    FROM vehicles v
-    LEFT JOIN vehicle_employee ve ON v.id = ve.vehicle_id
-    LEFT JOIN employees e ON ve.employee_id = e.id
-    ORDER BY v.id;
-  `);
-  return result.rows;
+export async function createEmployee(employeeData: any, poolClient?: PoolClient) {
+  logger.info('Creating employee with data:', employeeData);
+
+  const result = await (poolClient || pool).query(
+    `
+    INSERT INTO employees (name, role, status, contact_email, hire_date)
+    VALUES ($1, $2, $3, $4, $5)
+    RETURNING *
+    `,
+    [employeeData.name, employeeData.role, employeeData.status, employeeData.email, employeeData.hire_date]
+  );
+  return result.rows[0];
 }
 
-/**
- * Returns a list of all employees.
- * Each employee includes all columns from the employees table.
- */
 export async function getAllEmployees() {
   const result = await pool.query('SELECT * FROM employees ORDER BY id');
   return result.rows;
 }
 
-/**
- * Lists all drivers currently assigned to at least one vehicle, including assignment details.
- * Returns driver info, vehicle license plate, and assignment period.
- */
 export async function getDriversWithVehicles() {
   const result = await pool.query(`
     SELECT
@@ -57,10 +57,6 @@ export async function getDriversWithVehicles() {
   return result.rows;
 }
 
-/**
- * Lists all drivers who currently have no active vehicle assignments.
- * Returns driver id and name.
- */
 export async function getDriversWithoutVehicles() {
   const result = await pool.query(`
     SELECT
@@ -82,9 +78,6 @@ export async function getDriversWithoutVehicles() {
   return result.rows;
 }
 
-/**
- * Returns the total number of employees with the role 'driver'.
- */
 export async function getTotalDrivers() {
   const result = await pool.query(`
     SELECT COUNT(*) AS total_drivers
@@ -94,9 +87,6 @@ export async function getTotalDrivers() {
   return Number(result.rows[0].total_drivers);
 }
 
-/**
- * Returns the total number of drivers with at least one current vehicle assignment.
- */
 export async function getDriversWithVehiclesCount() {
   const result = await pool.query(`
     SELECT COUNT(DISTINCT e.id) AS drivers_with_vehicles
@@ -108,9 +98,6 @@ export async function getDriversWithVehiclesCount() {
   return Number(result.rows[0].drivers_with_vehicles);
 }
 
-/**
- * Returns the total number of drivers without any current vehicle assignment.
- */
 export async function getDriversWithoutVehiclesCount() {
   const result = await pool.query(`
     SELECT COUNT(*) AS drivers_without_vehicles
