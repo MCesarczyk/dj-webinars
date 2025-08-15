@@ -1,4 +1,4 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, computed, inject, input, model, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { EmployeeOnboardingService } from '../employee-onboarding/employee-onboarding.service';
@@ -81,34 +81,56 @@ import { LoggerService } from '../../services/logger.service';
               <div class="space-y-8">
               <ng-content></ng-content>
                 <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
-                  <button
-                    type="button"
-                    (click)="onCancel()"
-                    [disabled]="onboardingService.isSubmitting()"
-                    class="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    (click)="onSubmit()"
-                    [disabled]="!onboardingService.isEmployeeFormValid() || (onboardingService.isDriverRole() && !onboardingService.isVehicleAssignmentValid()) || onboardingService.isSubmitting()"
-                    class="px-6 py-2.5 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
-                  >
-                    <svg *ngIf="onboardingService.isSubmitting()"
-                        class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                        fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                      <path class="opacity-75" fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-                    </svg>
-                    <svg *ngIf="!onboardingService.isSubmitting()"
-                        class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
-                    </svg>
-                    {{ onboardingService.isSubmitting() ? 'Processing...' : 'Complete Onboarding' }}
-                  </button>
+                  @if (isFirstPage()) {
+                    <button
+                      type="button"
+                      (click)="onCancel()"
+                      [disabled]="onboardingService.isSubmitting()"
+                      class="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  } @else {
+                    <button
+                      type="button"
+                      (click)="onboardingService.decreasePage()"
+                      [disabled]="onboardingService.isSubmitting()"
+                      class="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      Back
+                    </button>
+                  }
+                  @if (isLastPage()) {
+                    <button
+                      type="button"
+                      (click)="onSubmit()"
+                      [disabled]="!ableToSend()"
+                      class="px-6 py-2.5 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+                    >
+                      <svg *ngIf="onboardingService.isSubmitting()"
+                          class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                          fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                        <path class="opacity-75" fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                      </svg>
+                      <svg *ngIf="!onboardingService.isSubmitting()"
+                          class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                      </svg>
+                      {{ onboardingService.isSubmitting() ? 'Processing...' : 'Complete Onboarding' }}
+                    </button>
+                  } @else {
+                    <button
+                      type="button"
+                      (click)="onboardingService.increasePage()"
+                      [disabled]="!onboardingService.isEmployeeFormValid() || onboardingService.isSubmitting()"
+                      class="px-6 py-2.5 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+                    >
+                      Next
+                    </button>
+                  }
                 </div>
               </div>
             }
@@ -130,6 +152,23 @@ export class OnboardingModalComponent {
   loggerService = inject(LoggerService);
 
   hideOnboarding = input<() => void>();
+
+  isFirstPage = computed(() => this.onboardingService.page() === 1);
+  isLastPage = computed(() => {
+    return this.onboardingService.page() === (this.onboardingService.isDriverRole() ? 2 : 1);
+  });
+
+  ableToSend = computed(() => {
+    if (this.onboardingService.isSubmitting()) {
+      return false;
+    }
+
+    if (this.onboardingService.isDriverRole()) {
+      return this.onboardingService.isEmployeeFormValid() && this.onboardingService.isVehicleAssignmentValid();
+    } else {
+      return this.onboardingService.isEmployeeFormValid();
+    }
+  });
 
   ngOnInit(): void {
     this.loggerService.info('🚀 OnboardingModalComponent: Component initialized');

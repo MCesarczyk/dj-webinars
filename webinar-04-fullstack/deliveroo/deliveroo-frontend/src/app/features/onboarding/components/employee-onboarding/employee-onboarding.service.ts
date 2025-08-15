@@ -24,27 +24,41 @@ export class EmployeeOnboardingService {
   showSuccessMessage = signal(false);
   errorMessage = signal('');
   successMessage = signal('');
-  selectedVehicle = signal<Vehicle | null>(null);
   isEmailChecking = signal(false);
   emailValidationMessage = signal('');
+
   isDriverRole = signal<boolean>(false);
-  isEmployeeFormValid = signal<boolean>(false);
-  isVehicleAssignmentValid = signal<boolean>(true);
 
   setIsDriverRole(value: boolean): void {
     this.isDriverRole.set(value);
   }
 
+  isEmployeeFormValid = signal<boolean>(false);
+
   setIsEmployeeFormValid(value: boolean): void {
     this.isEmployeeFormValid.set(value);
   }
+
+  isVehicleAssignmentValid = signal<boolean>(true);
 
   setIsVehicleAssignmentValid(value: boolean): void {
     this.isVehicleAssignmentValid.set(value);
   }
 
+  selectedVehicle = signal<Vehicle | null>(null);
+
   setSelectedVehicle(vehicle: Vehicle | null): void {
     this.selectedVehicle.set(vehicle);
+  }
+
+  page = signal<number>(1);
+
+  increasePage(): void {
+    this.page.update(value => value + 1);
+  }
+
+  decreasePage(): void {
+    this.page.update(value => value - 1);
   }
 
   employeeForm!: FormGroup;
@@ -309,6 +323,7 @@ export class EmployeeOnboardingService {
       since_date: today
     });
 
+    this.page.set(1);
     this.selectedVehicle.set(null);
     this.clearMessages();
   }

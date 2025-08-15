@@ -13,8 +13,11 @@ import { LoggerService } from '../../services/logger.service';
   imports: [CommonModule, OnboardingModalComponent, EmployeeInformationFormComponent, VehicleAssignmentFormComponent],
   template: `
     <app-onboarding-modal [hideOnboarding]="hideOnboarding()">
-      <app-employee-information-form></app-employee-information-form>
-      @if (onboardingService.isDriverRole()) {
+      {{ onboardingService.page() }}
+      @if (onboardingService.page() === 1) {
+        <app-employee-information-form></app-employee-information-form>
+      }
+      @if (onboardingService.page() === 2) {
         <app-vehicle-assignment-form></app-vehicle-assignment-form>
       }
     </app-onboarding-modal>
