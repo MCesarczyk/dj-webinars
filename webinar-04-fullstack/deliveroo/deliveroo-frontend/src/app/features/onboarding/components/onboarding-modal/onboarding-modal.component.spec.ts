@@ -29,7 +29,8 @@ describe('OnboardingModalComponent', () => {
     successMessage: jest.fn().mockReturnValue(''),
     isDriverRole: jest.fn().mockReturnValue(false),
     isEmployeeFormValid: jest.fn().mockReturnValue(false),
-    isVehicleAssignmentValid: jest.fn().mockReturnValue(true)
+    isVehicleAssignmentValid: jest.fn().mockReturnValue(true),
+    page: jest.fn().mockReturnValue(1)
   };
 
   const renderComponent = async () => {
@@ -218,6 +219,7 @@ describe('OnboardingModalComponent', () => {
         mockOnboardingService.isEmployeeFormValid.mockReturnValue(true);
         mockOnboardingService.isDriverRole.mockReturnValue(true);
         mockOnboardingService.isVehicleAssignmentValid.mockReturnValue(false);
+        mockOnboardingService.page.mockReturnValue(2);
 
         await renderComponent();
 
@@ -227,8 +229,10 @@ describe('OnboardingModalComponent', () => {
 
       it('should be enabled when all forms are valid', async () => {
         mockOnboardingService.isEmployeeFormValid.mockReturnValue(true);
-        mockOnboardingService.isDriverRole.mockReturnValue(false);
+        mockOnboardingService.isDriverRole.mockReturnValue(true);
+        mockOnboardingService.isVehicleAssignmentValid.mockReturnValue(true);
         mockOnboardingService.isSubmitting.mockReturnValue(false);
+        mockOnboardingService.page.mockReturnValue(2);
 
         await renderComponent();
 
@@ -246,8 +250,10 @@ describe('OnboardingModalComponent', () => {
 
       it('should call onSubmit when clicked', async () => {
         const user = userEvent.setup();
+        mockOnboardingService.isDriverRole.mockReturnValue(false);
         mockOnboardingService.isEmployeeFormValid.mockReturnValue(true);
         mockOnboardingService.isSubmitting.mockReturnValue(false);
+        mockOnboardingService.page.mockReturnValue(1);
 
         const { fixture } = await renderComponent();
         const component = fixture.componentInstance;

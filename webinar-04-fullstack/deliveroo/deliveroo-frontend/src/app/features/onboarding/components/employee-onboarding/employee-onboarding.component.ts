@@ -13,7 +13,6 @@ import { LoggerService } from '../../services/logger.service';
   imports: [CommonModule, OnboardingModalComponent, EmployeeInformationFormComponent, VehicleAssignmentFormComponent],
   template: `
     <app-onboarding-modal [hideOnboarding]="hideOnboarding()">
-      {{ onboardingService.page() }}
       @if (onboardingService.page() === 1) {
         <app-employee-information-form></app-employee-information-form>
       }
