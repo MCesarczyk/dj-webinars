@@ -316,7 +316,8 @@ export class EmployeeOnboardingService {
     const today = new Date().toISOString().split('T')[0];
     this.employeeForm.patchValue({
       status: 'active',
-      hire_date: today
+      hire_date: today,
+      role: ''
     });
     this.vehicleAssignmentForm.patchValue({
       is_primary: true,
