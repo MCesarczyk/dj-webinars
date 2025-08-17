@@ -15,7 +15,11 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
       const cachedVehicles = await redisClient.get('vehicles');
       if (cachedVehicles) {
         logger.info('Returning vehicles from cache');
-        res.json(JSON.parse(cachedVehicles));
+        res.json({
+          success: true,
+          data: JSON.parse(cachedVehicles),
+          message: 'Available unassigned vehicles retrieved from cache successfully'
+        });
         return;
       }
       const vehiclesRaw = await getAllAvailableVehiclesWithoutDriver();
@@ -47,7 +51,11 @@ router.get('/unassigned', async (req: Request, res: Response): Promise<void> => 
     const cachedVehicles = await redisClient.get('vehicles-unassigned');
     if (cachedVehicles) {
       logger.info('Returning unassigned vehicles from cache');
-      res.json(JSON.parse(cachedVehicles));
+      res.json({
+        success: true,
+        data: JSON.parse(cachedVehicles),
+        message: 'Unassigned vehicles retrieved from cache successfully'
+      });
       return;
     }
     const vehiclesRaw = await getAllAvailableVehiclesWithoutDriver();
