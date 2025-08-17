@@ -3028,3 +3028,10 @@ INSERT INTO vehicle_employee (vehicle_id, employee_id, since_date, planned_leave
 (472, 506, '2024-11-04', NULL, 'Bellicus laboriosam atqui ustulo vilitas vetus valetudo ultio suus vicissitudo.', TRUE, '2025-04-25'),
 (472, 773, '2023-12-19', NULL, 'Texo clam succurro ancilla summa.', FALSE, '2024-04-30'),
 (472, 257, '2023-12-24', NULL, 'Virga curo aestus adfero a cultura desolo contigo curriculum.', FALSE, '2024-02-01');
+
+-- This will sync the sequence with the highest current id
+SELECT setval(
+    pg_get_serial_sequence('employees', 'id'),
+    COALESCE((SELECT MAX(id) FROM employees) + 1, 1),
+    false
+);
