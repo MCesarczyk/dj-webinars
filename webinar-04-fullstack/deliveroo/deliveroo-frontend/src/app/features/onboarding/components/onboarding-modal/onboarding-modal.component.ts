@@ -77,7 +77,7 @@ import { LoggerService } from '../../services/logger.service';
             }
 
             <!-- Forms -->
-            @if (!onboardingService.isLoading()) {
+            @if (!onboardingService.isLoading() && !onboardingService.successMessage()) {
               <div class="space-y-8">
               <ng-content></ng-content>
                 <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
